@@ -19,12 +19,12 @@ class Product extends Model {
   declare name: string;
 
   @Column({
-    type: DataType.STRING(25),
+    type: DataType.STRING(255),
   })
   declare image: string;
 
   @AllowNull
-  @Column(DataType.TEXT)
+  @Column(DataType.STRING(25))
   declare description?: string;
 
   @Column({

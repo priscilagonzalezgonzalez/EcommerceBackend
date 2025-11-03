@@ -4,14 +4,34 @@ import ProductInterface from '../interfaces/product.interface';
 
 class ProductController {
 
-    // List all products
+    // List all products with pagination
     static async getAll( req: Request, res: Response ) {
         try {
-            const products : ProductInterface[] = await Product.findAll();
+            // Get pagination parameters from query string (default: page 1, limit 10)
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || page*8;
+            const offset = 0;
+
+            // Get products with pagination
+            const { count, rows: products } = await Product.findAndCountAll({
+                limit,
+                offset,
+                order: [['id', 'ASC']]
+            });
+
+            // Calculate total pages
+            const totalPages = Math.ceil(count / limit);
 
             return res.status(200).json({
                 success: true,
-                data: products
+                data: products,
+                //Optional
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalItems: count,
+                    itemsPerPage: limit
+                }
             });
         }
         catch(error){
