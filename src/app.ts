@@ -1,11 +1,10 @@
 import 'dotenv/config'
 import app from './server'
 import sequelize from './config/db'
-import { error } from 'console'
 
 const port = process.env.PORT || 4000
 
-sequelize.sync().then( result => {
+sequelize.sync( {alter: true }).then( result => {
     console.log(result)
     
     // Start app

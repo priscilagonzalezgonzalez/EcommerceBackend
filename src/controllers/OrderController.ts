@@ -30,14 +30,19 @@ class OrderController {
         const t = await sequelize.transaction();
         try {
             // Pass the data to create the Order and an array of OrderProduct
-            const { status, total, customerName, country, street, city, zipCode, phone, email, orderProducts } = req.body
+            //const { status, total, customerName, country, street, city, zipCode, phone, email, orderProducts } = req.body;
+            const { status, total, shippingDetails, orderProducts } = req.body;
+            const { customerName, country, street, city, zipCode, phone, email } = shippingDetails;
+            
             // Create the order
             const order = await Order.create({
                 status, total, customerName, country, street, city, zipCode, phone, email
             }, 
             { transaction: t })
 
-            // Create order products. for of is an async function
+            console.log(order);
+
+            // Create order products.
             for (const orderProduct of orderProducts) {
                 await OrderProduct.create({
                     orderId: order.id,
@@ -50,7 +55,7 @@ class OrderController {
             // Commit the transaction
             await t.commit();
 
-            return res.status(200).json({
+            return res.status(201).json({
                 success: true, 
                 data: {
                     order: order,
