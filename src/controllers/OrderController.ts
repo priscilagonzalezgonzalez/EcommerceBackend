@@ -34,18 +34,20 @@ class OrderController {
             const { status, total, shippingDetails, orderProducts } = req.body;
             const { customerName, country, street, city, zipCode, phone, email } = shippingDetails;
             
+            console.log(req.body);
+
             // Create the order
             const order = await Order.create({
                 status, total, customerName, country, street, city, zipCode, phone, email
             }, 
             { transaction: t })
 
-            console.log(order);
+            console.log(orderProducts);
 
             // Create order products.
             for (const orderProduct of orderProducts) {
                 await OrderProduct.create({
-                    orderId: order.id,
+                    orderId: order.toJSON().id,
                     productId: orderProduct.productId,
                     quantity: orderProduct.quantity // TODO: Modify the stock of the product
                 },
@@ -58,7 +60,7 @@ class OrderController {
             return res.status(201).json({
                 success: true, 
                 data: {
-                    order: order,
+                    order: order.toJSON(),
                     orderProducts: orderProducts,
                 }
             })
