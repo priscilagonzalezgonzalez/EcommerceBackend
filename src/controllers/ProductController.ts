@@ -1,6 +1,7 @@
 import Product from "../models/Product";
 import { Request, Response } from 'express';
 import ProductInterface from '../interfaces/product.interface';
+import { Op } from "sequelize";
 
 class ProductController {
 
@@ -11,11 +12,21 @@ class ProductController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || page*8;
             const offset = 0;
+            const productFilter: any = {};
+
+            // Filter products with stock >= 1 (excludes NULL and 0)
+            productFilter.stock = { 
+                [Op.gte]: 1
+            };
+            
+            // Also filter by active products (optional, but recommended)
+            productFilter.active = true;
 
             // Get products with pagination
             const { count, rows: products } = await Product.findAndCountAll({
                 limit,
                 offset,
+                where: productFilter,
                 order: [['id', 'ASC']]
             });
 

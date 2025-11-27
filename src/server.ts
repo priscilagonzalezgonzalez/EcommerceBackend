@@ -30,4 +30,20 @@ app.use(express.json())
 app.use('/api/v1/products', productsRouter)
 app.use('/api/v1/orders', ordersRouter)
 
+// SSE Endpoints
+app.get("/api/v1/currentTime", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+  
+    const intervalId = setInterval(() => {
+      res.write(`data: ${new Date().toLocaleTimeString()}\n\n`);
+    }, 1000);
+  
+    res.on("close", () => {
+      clearInterval(intervalId);
+    });
+  });
+
 export default app;
