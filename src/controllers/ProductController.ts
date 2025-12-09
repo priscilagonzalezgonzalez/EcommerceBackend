@@ -12,14 +12,15 @@ class ProductController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || page*8;
             const offset = 0;
+
             const productFilter: any = {};
 
-            // Filter products with stock >= 1 (excludes NULL and 0)
+            // Filter products with stock >= 1
             productFilter.stock = { 
                 [Op.gte]: 1
             };
             
-            // Also filter by active products (optional, but recommended)
+            // Filter by active products
             productFilter.active = true;
 
             // Get products with pagination

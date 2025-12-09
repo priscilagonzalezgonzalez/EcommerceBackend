@@ -1,5 +1,6 @@
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Default, AllowNull, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, Default, AllowNull, HasMany, AfterUpdate } from 'sequelize-typescript';
 import OrderProduct from './OrderProduct';
+import eventEmitter from '../events/eventBus';
 
 @Table({
   tableName: 'product'
@@ -46,7 +47,14 @@ class Product extends Model {
 
   @HasMany(() => OrderProduct)
   declare orderProducts: OrderProduct[]
-
+  
+  @AfterUpdate
+  static onStockUpdate(product: Product) {
+    console.log(product.toJSON());
+    eventEmitter.emit("productUpdated", product);
+  }
 }
+
+
 
 export default Product;

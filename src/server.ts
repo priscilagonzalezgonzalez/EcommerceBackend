@@ -4,13 +4,19 @@ import cors from 'cors'
 // Routes imports
 import productsRouter from './routes/productsRouter';
 import ordersRouter from './routes/ordersRouter';
+
+// DB
 import db from './config/db';
+
+// Controllers
+import { ProductsStreamController } from './controllers/ProductStreamController';
 
 export async function connectDB() {
     try {
         await db.authenticate()
         // await db.sync()
         console.log('Conexión exitosa a la BD')
+        
     } catch (error) {
         // console.log(error)
         console.log('Falló la conexión a la BD', error.message)
@@ -21,29 +27,16 @@ connectDB()
 
 const app = express();
 
+// Middlewares
 app.use( cors() )
-
-// Parses JSON requests with payloads, and populates req.body
 app.use(express.json())
 
-// Endpoints
+// REST endpoints
 app.use('/api/v1/products', productsRouter)
 app.use('/api/v1/orders', ordersRouter)
 
-// SSE Endpoints
-app.get("/api/v1/currentTime", (req, res) => {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-    res.flushHeaders();
+// SSE endpoints
+app.get("/api/v1/products-stream", ProductsStreamController);
   
-    const intervalId = setInterval(() => {
-      res.write(`data: ${new Date().toLocaleTimeString()}\n\n`);
-    }, 1000);
-  
-    res.on("close", () => {
-      clearInterval(intervalId);
-    });
-  });
 
 export default app;
