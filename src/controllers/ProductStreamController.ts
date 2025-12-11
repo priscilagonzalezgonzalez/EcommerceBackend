@@ -1,6 +1,7 @@
+import { Request, Response } from 'express';
 import { eventEmitter } from "../events/eventBus";
 
-export const ProductsStreamController = (req, res) => {
+export const ProductsStreamController = (req: Request, res: Response) => {
   console.log("🔥 SSE HANDLER ATTACHED");
 
   res.setHeader("Content-Type", "text/event-stream");
@@ -10,6 +11,7 @@ export const ProductsStreamController = (req, res) => {
 
   const onUpdate = (data) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
+    console.log(data);
   };
 
   eventEmitter.on("productUpdated", onUpdate);

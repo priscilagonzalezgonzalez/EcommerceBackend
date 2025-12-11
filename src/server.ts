@@ -9,9 +9,6 @@ import productsSSERouter from './routes/productsSSERouter'
 // DB
 import db from './config/db';
 
-// Controllers
-import { ProductsStreamController } from './controllers/ProductStreamController';
-
 export async function connectDB() {
     try {
         await db.authenticate()

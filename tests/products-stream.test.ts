@@ -1,17 +1,18 @@
 import db from '../src/config/db'
 import app from '../src/server'
 import Product from '../src/models/Product';
-import {EventSource} from 'eventsource'; 
-
-const port = process.env.PORT || 4000
+import request from 'supertest';
+import http from 'http';
 
 describe('products-stream', () => {
-    let server;
+    let server: http.Server;
 
-    beforeAll(async() => {
+    beforeAll(async () => {
         await db.authenticate();
+        // Create HTTP Server
+        server = http.createServer(app);
         await new Promise<void>((resolve) => {
-            server = app.listen(port, () => {
+            server.listen(0, () => {
                 resolve();
             });
         });
@@ -29,63 +30,104 @@ describe('products-stream', () => {
     });
 
     test('Sent SSE event to client', async () => {
-        // Open SSE connection
-        const sseUrl = 'http://localhost:4000/api/v1/products-stream/';
-
-        // Product data
         const productId = 17;
         const expectedName = 'Rattan Outdoor';
 
+        // Promise para recibir el mensaje SSE usando http nativo
         const messageReceived = new Promise<Product>((resolve, reject) => {
-            const eventSource = new EventSource(sseUrl);
-
-            eventSource.onopen = () => {
-                console.log('SSE connection opened');
-            };
-
             const timeout = setTimeout(() => {
-                eventSource.close();
+                req.destroy();
                 reject(new Error('Timeout: No se recibió el mensaje SSE'));
             }, 10000);
 
-            // Test message received
-            eventSource.onmessage = (event) => {
-                try {
-                    const data: Product = JSON.parse(event.data);
-                    eventSource.close();
-                    resolve(data);
-                } catch (error) {
+            let buffer = '';
+            const port = (server.address() as any)?.port;
+
+            // Make the HTTP Request
+            const req = http.request({
+                hostname: 'localhost',
+                port: port,
+                path: '/api/v1/products-stream',
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/event-stream'
+                }
+            }, (res) => {
+                //  Test response Headers
+                expect(res.statusCode).toBe(200);
+                expect(res.headers['content-type']).toContain('text/event-stream');
+                
+                res.on('data', (chunk: Buffer) => {
+                    buffer += chunk.toString();
+                    
+                    // Parse SSE message (format: "data: {...}\n\n")
+                    const messages = buffer.split('\n\n');
+                    buffer = messages.pop() || ''; // Mantener el último fragmento incompleto
+                    
+                    for (const message of messages) {
+                        if (message.trim()) {
+                            const lines = message.split('\n');
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        const data: Product = JSON.parse(line.substring(6));
+                                        clearTimeout(timeout);
+                                        req.destroy();
+                                        resolve(data);
+                                        return;
+                                    } catch (error) {
+                                        // Continue
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                res.on('error', (error: Error) => {
+                    clearTimeout(timeout);
+                    req.destroy();
                     reject(error);
-                }                
-            }
-            eventSource.onerror = (error) => {
+                });
+            });
+
+            req.on('error', (error: Error) => {
                 clearTimeout(timeout);
-                eventSource.close();
                 reject(error);
-            };
+            });
+
+            req.end();
+
+            // Wait for the server connection to be stablished, then update the product
+            setTimeout(async () => {
+                try {
+                    const updatedProduct: Product | null = await Product.findByPk(productId);
+                    if (!updatedProduct) {
+                        clearTimeout(timeout);
+                        req.destroy();
+                        reject(new Error('Product does not exist'));
+                        return;
+                    }
+                    // Trigger the AfterUpdate Hook
+                    updatedProduct.stock = updatedProduct.stock + 1;
+                    console.log(`Updating product ${productId}: stock -> ${updatedProduct.stock}`);
+                    await updatedProduct.save();
+                    console.log('Product saved, event should be emitted');
+                } catch (error) {
+                    clearTimeout(timeout);
+                    req.destroy();
+                    reject(error);
+                }
+            }, 500);
         });
 
-        await new Promise(resolve => setTimeout(resolve, 900));
-
-        // Update product
-        const updatePromise = ( async () => {
-            const updatedProduct: Product|null = await Product.findByPk(productId);
-            if(!updatedProduct) {
-                throw new Error('Product does not exist');
-            }
-            updatedProduct.stock = 10;
-            await updatedProduct.save();
-        })();
-
-        const [receivedData] = await Promise.all([
-            messageReceived,
-            updatePromise
-        ]);
+        // Test the expected data againts the one received 
+        const receivedData = await messageReceived;
 
         expect(receivedData).toBeDefined();
         expect(receivedData.id).toBe(productId);
         expect(receivedData.name).toBe(expectedName);
-    }, 10000)
+    }, 15000);
 
     
     
