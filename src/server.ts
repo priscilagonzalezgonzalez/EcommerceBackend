@@ -4,6 +4,7 @@ import cors from 'cors'
 // Routes imports
 import productsRouter from './routes/productsRouter';
 import ordersRouter from './routes/ordersRouter';
+import productsSSERouter from './routes/productsSSERouter'
 
 // DB
 import db from './config/db';
@@ -23,7 +24,7 @@ export async function connectDB() {
     }
 }
 
-connectDB()
+//connectDB()
 
 const app = express();
 
@@ -36,7 +37,7 @@ app.use('/api/v1/products', productsRouter)
 app.use('/api/v1/orders', ordersRouter)
 
 // SSE endpoints
-app.get("/api/v1/products-stream", ProductsStreamController);
+app.use("/api/v1/products-stream", productsSSERouter);
   
 
 export default app;
