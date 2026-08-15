@@ -1,5 +1,5 @@
 import db from '../src/config/db'
-import app from '../src/server'
+import app from '../src/app'
 import Product from '../src/models/Product';
 import request from 'supertest';
 import http from 'http';

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { eventEmitter } from "../events/eventBus";
+import Product from '../models/Product';
 
 export const ProductsStreamController = (req: Request, res: Response) => {
   console.log("🔥 SSE HANDLER ATTACHED");
@@ -9,7 +10,7 @@ export const ProductsStreamController = (req: Request, res: Response) => {
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
-  const onUpdate = (data) => {
+  const onUpdate = (data: Product) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
     console.log(data);
   };

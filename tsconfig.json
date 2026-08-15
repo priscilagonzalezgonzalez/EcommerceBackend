@@ -4,9 +4,8 @@
       "rootDir": "./src",
       "lib": ["esnext"],
       "target": "ESNext",
-      "moduleResolution": "node",
-      "module": "commonjs",
-      "strict": false,
+      "module": "nodenext",
+      "strict": true,
       "sourceMap": true,
       "esModuleInterop": true,
       "declaration": true,
@@ -15,6 +14,6 @@
       "skipLibCheck": true,
       "jsx":"react-jsx",
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["src/**/*.test.ts"]
 }
