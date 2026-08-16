@@ -1,33 +1,26 @@
-import express from 'express';
-import cors from 'cors'
+import "dotenv/config";
+import app from "./app";
+import db from "./config/db";
+import redis from "./config/redis";
+import "./workers";
 
-// Routes imports
-import productsRouter from './routes/productsRouter';
-import ordersRouter from './routes/ordersRouter';
-import db from './config/db';
+const port = process.env.PORT || 4000;
 
-export async function connectDB() {
-    try {
-        await db.authenticate()
-        // await db.sync()
-        console.log('Conexión exitosa a la BD')
-    } catch (error) {
-        // console.log(error)
-        console.log('Falló la conexión a la BD', error.message)
-    }
+async function start() {
+  try {
+    await db.authenticate();
+    console.log("Successfully connected to the database");
+
+    await redis.client.connect();
+    console.log("Successfully connected to Redis");
+
+    app.listen(port, () => {
+      console.log(`Running app in port ${port}...`);
+    });
+  } catch (error) {
+    console.error("Falló el arranque del servidor", error);
+    process.exit(1);
+  }
 }
 
-connectDB()
-
-const app = express();
-
-app.use( cors() )
-
-// Parses JSON requests with payloads, and populates req.body
-app.use(express.json())
-
-// Endpoints
-app.use('/api/v1/products', productsRouter)
-app.use('/api/v1/orders', ordersRouter)
-
-export default app;
+start();

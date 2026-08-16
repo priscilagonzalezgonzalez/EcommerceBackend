@@ -1,0 +1,1 @@
+export type ValidationSource = 'body' | 'params' | 'query';

@@ -13,8 +13,9 @@ export const db = new Sequelize({
     models: [__dirname + '/../models/**/*'],
     
     retry: {
-        max: 5, 
-      },
+      max: 5, 
+    },
+    logging: true
 })
 
 export default db;

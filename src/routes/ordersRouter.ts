@@ -1,14 +1,18 @@
-import { Router } from 'express';
-import OrderController from '../controllers/OrderController';
+import { Router } from "express";
+import OrderController from "../controllers/OrderController";
+import { validateSchema } from "../middlewares/common/validateSchema";
+import { createOrderSchema } from "../schemas/order.schema";
+import { orderService } from "../container";
 
 const router = Router();
+const orderController = new OrderController(orderService);
 
-router.get('/:id', 
-  OrderController.getById
-);
+router.get("/:id", orderController.getById.bind(orderController));
 
-router.post('/', 
-  OrderController.create
+router.post(
+  "/",
+  validateSchema(createOrderSchema, "body"),
+  orderController.create.bind(orderController),
 );
 
 export default router;

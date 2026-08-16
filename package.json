@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "nodemon",
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node dist/app.js"
+    "start": "npm run build && node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,19 +16,29 @@
     "@sequelize/core": "^7.0.0-alpha.46",
     "@sequelize/postgres": "^7.0.0-alpha.46",
     "@tailwindcss/vite": "^4.1.14",
+    "bullmq": "^6.0.11",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "sequelize": "^6.37.7",
+    "ioredis": "^6.0.0",
+    "redis": "^6.2.0",
+    "sequelize": "^6.37.8",
     "sequelize-typescript": "^2.1.6",
-    "tailwindcss": "^4.1.14"
+    "tailwindcss": "^4.1.14",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.7.0",
+    "eventsource": "^4.1.0",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.10",
     "rimraf": "^6.0.1",
     "sequelize-cli": "^6.6.3",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

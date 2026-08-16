@@ -1,18 +1,22 @@
-import 'dotenv/config'
-import app from './server'
-import sequelize from './config/db'
+import "./types/express";
+import express from "express";
+import cors from "cors";
 
-const port = process.env.PORT || 4000
+import productsRouter from "./routes/productsRouter";
+import ordersRouter from "./routes/ordersRouter";
+import productsSSERouter from "./routes/productsSSERouter";
 
-sequelize.sync( {alter: true }).then( result => {
-    console.log(result)
-    
-    // Start app
-    app.listen( port, () => {
-        console.log(`Running app in port ${port}...`)
-    })
-})
-.catch(error => {
-    console.error(error)
-})
+const app = express();
 
+// Middlewares
+app.use(cors());
+app.use(express.json());
+
+// REST endpoints
+app.use("/api/v1/products", productsRouter);
+app.use("/api/v1/orders", ordersRouter);
+
+// SSE endpoints
+app.use("/api/v1/products-stream", productsSSERouter);
+
+export default app;
