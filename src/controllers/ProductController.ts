@@ -2,6 +2,7 @@ import Product from "../models/Product";
 import { Request, Response } from "express";
 import ProductInterface from "../interfaces/product.interface";
 import { Op } from "sequelize";
+import { ProductIdParams, UpdateProductPayload } from "../types/product.types";
 
 class ProductController {
   // List all products with pagination
@@ -56,8 +57,12 @@ class ProductController {
   // Get one product by id
   static async getById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const product: Product | null = await Product.findByPk(id);
+      const params = req.validated?.params as ProductIdParams | undefined;
+      if (!params) {
+        return res.status(500).json({ success: false, message: "Missing params context" });
+      }
+
+      const product = await Product.findByPk(params.id);
 
       return res.status(200).json({
         success: true,
@@ -110,8 +115,20 @@ class ProductController {
   // Update existing product
   static async update(req: Request, res: Response) {
     try {
-      const productData: Partial<ProductInterface> = req.body;
-      const { id } = req.params;
+      const params = req.validated?.params as ProductIdParams | undefined;
+      const body = req.validated?.body as UpdateProductPayload | undefined;
+      if (!params || !body) {
+        return res.status(500).json({ success: false, message: "Missing required context" });
+      }
+
+      const product = await Product.findByPk(params.id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+      
       const {
         name,
         description = "",
@@ -119,17 +136,7 @@ class ProductController {
         price,
         active,
         stock,
-      } = productData;
-
-      // Modify given a product id
-      const product = await Product.findByPk(id);
-
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
+      } = body;
 
       // Modify all posible attributes
       if (name !== undefined) product.name = name;
@@ -158,11 +165,26 @@ class ProductController {
   // Delete a product by id
   static async delete(req: Request, res: Response) {
     try {
-      const id = req.params.id;
-      const product = await Product.findByPk(id);
-      if (product) {
-        product.destroy();
+      const params = req.validated?.params as ProductIdParams | undefined;
+      if (!params) {
+        return res.status(500).json({ success: false, message: "Missing params context" });
       }
+
+      const product = await Product.findByPk(params.id);
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      product.destroy();
+
+      return res.status(200).json({
+        success: true,
+        message: "Product deleted successfully",
+        data: product,
+      });
     } catch (error) {
       return res.status(500).json({
         success: false,
