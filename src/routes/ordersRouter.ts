@@ -1,13 +1,17 @@
 import { Router } from "express";
 import OrderController from "../controllers/OrderController";
 import { validateSchema } from "../middlewares/common/validateSchema";
-import { createOrderSchema } from "../schemas/order.schema";
+import { createOrderSchema, orderIdParamsSchema } from "../schemas/order.schema";
 import { orderService } from "../container";
 
 const router = Router();
 const orderController = new OrderController(orderService);
 
-router.get("/:id", orderController.getById.bind(orderController));
+router.get(
+  "/:id",
+  validateSchema(orderIdParamsSchema, "params"),
+  orderController.getById.bind(orderController),
+);
 
 router.post(
   "/",

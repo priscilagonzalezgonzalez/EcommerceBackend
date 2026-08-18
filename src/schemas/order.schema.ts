@@ -1,6 +1,10 @@
 import z from "zod";
 import { CartItemSchema } from "./cart.schema";
 
+export const orderIdParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
 export const ReserveOrderPayloadSchema = z.object({
  userId: z.number().optional(),
  total: z.number().positive(),

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Order from "../models/Order";
 import { OrderService } from "../services/OrderService";
-import { CreateOrderPayload } from "../types/order.types";
+import { CreateOrderPayload, OrderIdParams } from "../types/order.types";
 
 class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -27,8 +27,15 @@ class OrderController {
   // Get order by id
   async getById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const order = await Order.findByPk(id);
+      const params = req.validated?.params as OrderIdParams | undefined;
+      if (!params) {
+        return res.status(500).json({
+          success: false,
+          message: "Missing params context",
+        });
+      }
+
+      const order = await Order.findByPk(params.id);
 
       return res.status(200).json({
         success: true,
