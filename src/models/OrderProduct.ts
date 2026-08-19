@@ -3,7 +3,8 @@ import Order from './Order';
 import Product from './Product';
 
 @Table({
-  tableName: 'order_products'
+  tableName: 'order_products',
+  timestamps: true
 })
 class OrderProduct extends Model {
 
@@ -30,9 +31,6 @@ class OrderProduct extends Model {
     type: DataType.INTEGER,
   })
   declare quantity: number;
-
-  /* @Column
-  declare createdAt: Date; */
 
   @BelongsTo(() => Order)
   declare order: Order

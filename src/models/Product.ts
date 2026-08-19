@@ -3,7 +3,8 @@ import OrderProduct from './OrderProduct';
 import eventEmitter from '../events/eventBus';
 
 @Table({
-  tableName: 'products'
+  tableName: 'products',
+  timestamps: true
 })
 class Product extends Model {
 
@@ -41,9 +42,6 @@ class Product extends Model {
     type: DataType.INTEGER,
   })
   declare stock: number;
-
-  @Column
-  declare createdAt: Date;
 
   @HasMany(() => OrderProduct)
   declare orderProducts: OrderProduct[]

@@ -3,6 +3,7 @@ import OrderProduct from './OrderProduct';
 
 @Table({
   tableName: 'orders',
+  timestamps: true
 })
 class Order extends Model {
 
@@ -50,9 +51,6 @@ class Order extends Model {
   @IsEmail
   @Column
   declare email?: string;
-
-  /* @Column
-  declare createdAt: Date; */
 
   @HasMany(() => OrderProduct)
   declare orderProducts: OrderProduct[]

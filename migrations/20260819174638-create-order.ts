@@ -41,12 +41,12 @@ export default {
       },
       createdAt: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.DATE,
         defaultValue: Sequelize.literal('now()'), 
       },
       updatedAt: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.DATE,
         defaultValue: Sequelize.literal('now()'), 
       }
     });

@@ -1,6 +1,6 @@
 'use strict';
 
-import { QueryInterface, DataTypes } from "sequelize";
+import { QueryInterface, DataTypes, Sequelize } from "sequelize";
 
 /** @type {import('sequelize-cli').Migration} */
 export default {
@@ -24,12 +24,12 @@ export default {
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        defaultValue: Sequelize.literal('now()'),
       },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        defaultValue: Sequelize.literal('now()'),
       }
     });
   },
