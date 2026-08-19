@@ -3,7 +3,7 @@ import OrderProduct from './OrderProduct';
 import eventEmitter from '../events/eventBus';
 
 @Table({
-  tableName: 'product'
+  tableName: 'products'
 })
 class Product extends Model {
 
