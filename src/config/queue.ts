@@ -1,6 +1,6 @@
-import { env } from "process";
+import { env } from "./env";
 
 export const connection = {
-  url: env.REDIS_URL || "redis://127.0.0.1:6379",
+  url: env.REDIS_URL,
   maxRetriesPerRequest: null,
 };

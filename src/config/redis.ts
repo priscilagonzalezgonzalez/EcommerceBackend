@@ -1,4 +1,4 @@
-import { env } from 'process';
+import { env } from "./env";
 import { createClient } from 'redis';
 
 const client = createClient({
