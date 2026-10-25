@@ -4,6 +4,7 @@
   "service": "app",
   "workspaceFolder": "/app",
   "shutdownAction": "stopCompose",
+<<<<<<< Updated upstream
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
   },
@@ -13,6 +14,16 @@
         "dbaeumer.vscode-eslint",
         "eamodio.gitlens"
       ]
+=======
+  "remoteUser": "node",
+  "postCreateCommand": "curl https://cursor.com/install -fsS | bash",
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:/home/node/.local/bin"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+>>>>>>> Stashed changes
     }
   }
 }
